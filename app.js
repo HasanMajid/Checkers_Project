@@ -2,6 +2,8 @@ var rows = [];
 var pieces = [];
 var squares = [];
 var grid = document.querySelector("#grid");
+var active;
+// active.className = "active";
 
 
 // Piece.prototype.moveDownRight = function () {
@@ -31,64 +33,159 @@ for (let i = 0; i < 8; i++) {
 function Piece(index, piece, row) {
     this.index = index;
     this.piece = piece;
-    this.className = "pieceUp";
     this.row = row;
-    let adder = 4;
+    let adder;
 
-    piece.onclick = moveDown;
-
+    if(piece.className == "pieceTop"){
+        piece.onclick = moveDown;
+    }
+    if(piece.className == "pieceBot"){
+        piece.onclick = moveUp;
+    }
+    
     function moveDown() {
+        if(active){
+            active = null;
+            
+        }
+        if(row == 7){
+            piece.onclick = null;
+            console.log(row);
+            return;
+        }
         if (row % 2 == 1) {
             adder = 3;
         }
         else {
             adder = 4;
         }
-        squares[index + adder].style = "background-color:cyan;";
+        //!((index)==(3 || 11 || 19 || 27 ||4 || 12 || 20 || 28))
+        //&& (index-3) % 8 !== 0 
+        if (squares[index + adder].firstChild == null && (index - 4) % 8 !== 0) {
+            squares[index + adder].style = "background-color:cyan;";
+            squares[index + adder].onclick = function () {
+                squares[index + adder].style = "background-color:black;";
+                squares[index + adder + 1].style = "background-color:black;";
 
-        squares[index + adder].onclick = function () {
-            squares[index + adder].style = "background-color:black;";
-            squares[index + adder + 1].style = "background-color:black;";
+                squares[index + adder + 1].onclick = null;
+                squares[index + adder].onclick = null;
 
-            squares[index + adder + 1].onclick = null;
-            squares[index + adder ].onclick = null;
-            let moveby = 72.5;
-            piece.style = `transform: translate(${moveby * (-1)}px, ${moveby}px)`;
-            // let clonedNode = piece.cloneNode(true);
-            let animate = function () {
-                squares[index].firstChild.remove();
-                index += adder;
-                row += 1;
-                squares[index].appendChild(piece);
-                piece.style = `transform: translate(0px,0px)`;
+                piece.onclick = null;
+                let moveby = 72.5;
+                piece.style = `transform: translate(${moveby * (-1)}px, ${moveby}px)`;
+                // let clonedNode = piece.cloneNode(true);
+                let append = function () {
+                    squares[index].firstChild.remove();
+                    index += adder;
+                    row += 1;
+                    squares[index].appendChild(piece);
+                    piece.style = `transform: translate(0px,0px)`;
+                    piece.onclick = moveDown;
+                }
+                myTimeout = setTimeout(append, 500);
+
+                console.log(squares);
             }
-            myTimeout = setTimeout(animate, 500);
-            console.log(squares);
         }
-        squares[index + adder + 1].style = "background-color:cyan;";
-        
-        squares[index + adder + 1].onclick = function () {
-            squares[index + adder + 1].style = "background-color:black;";
-            squares[index + adder].style = "background-color:black;";
+        if (squares[index + adder + 1].firstChild == null && (index - 3) % 8 !== 0) {
+            squares[index + adder + 1].style = "background-color:cyan;";
+            squares[index + adder + 1].onclick = function () {
+                squares[index + adder + 1].style = "background-color:black;";
+                squares[index + adder].style = "background-color:black;";
+                squares[index + adder + 1].onclick = null;
+                squares[index + adder].onclick = null;
 
-            squares[index + adder + 1].onclick = null;
-            squares[index + adder ].onclick = null;
-            let moveby = 72.5;
-            piece.style = `transform: translate(${moveby}px, ${moveby}px)`;
-            // let clonedNode = piece.cloneNode(true);
-            let animate = function () {
-                squares[index].firstChild.remove();
-                index += adder + 1;
-                row += 1;
-                squares[index].appendChild(piece);
-                piece.style = `transform: translate(0px,0px)`;
+                piece.onclick = null;
+                let moveby = 72.5;
+                piece.style = `transform: translate(${moveby}px, ${moveby}px)`;
+                // let clonedNode = piece.cloneNode(true);
+                let append = function () {
+                    squares[index].firstChild.remove();
+                    index += adder + 1;
+                    row += 1;
+                    squares[index].appendChild(piece);
+                    piece.style = `transform: translate(0px,0px)`;
+                    piece.onclick = moveDown;
+                }
+                myTimeout = setTimeout(append, 500);
+                console.log(squares);
+                
             }
-            myTimeout = setTimeout(animate, 500);
+        }
+        // if (index > 27 ){
+        //     piece.onclick = null;
+        // }
+    }
 
-            console.log(squares);
+    function moveUp() {
+        if(row == 0){
+            piece.onclick = null;
+            console.log(row);
+            return;
+        }
+        if (row % 2 == 1) {
+            subber = 4;
+        }
+        else {
+            subber = 3;
+        }
+        //!((index)==(3 || 11 || 19 || 27 ||4 || 12 || 20 || 28))
+        //&& (index-3) % 8 !== 0 
+        if (squares[index - subber].firstChild == null && (index - 3) % 8 !== 0) {
+            squares[index - subber].style = "background-color:cyan;";
+            squares[index - subber].onclick = function () {
+                squares[index - subber].style = "background-color:black;";
+                squares[index - subber - 1].style = "background-color:black;";
+
+                squares[index - subber - 1].onclick = null;
+                squares[index - subber].onclick = null;
+
+                piece.onclick = null;
+                let moveby = 72.5;
+                piece.style = `transform: translate(${moveby }px, ${moveby*(-1)}px)`;
+                // let clonedNode = piece.cloneNode(true);
+                let append = function () {
+                    squares[index].firstChild.remove();
+                    index -= subber;
+                    row -= 1;
+                    squares[index].appendChild(piece);
+                    piece.style = `transform: translate(0px,0px)`;
+                    piece.onclick = moveUp;
+                }
+                myTimeout = setTimeout(append, 500);
+
+                console.log(squares);
+            }
+        }
+        if (squares[index - subber - 1].firstChild == null && (index - 4) % 8 !== 0) {
+            squares[index - subber - 1].style = "background-color:cyan;";
+            squares[index - subber - 1].onclick = function () {
+                squares[index - subber - 1].style = "background-color:black;";
+                squares[index - subber].style = "background-color:black;";
+                squares[index - subber - 1].onclick = null;
+                squares[index - subber].onclick = null;
+
+                piece.onclick = null;
+                let moveby = 72.5;
+                piece.style = `transform: translate(${moveby* (-1)}px, ${moveby*(-1)}px)`;
+                // let clonedNode = piece.cloneNode(true);
+                let append = function () {
+                    squares[index].firstChild.remove();
+                    index -= subber +1;
+                    row -= 1;
+                    squares[index].appendChild(piece);
+                    piece.style = `transform: translate(0px,0px)`;
+                    piece.onclick = moveUp;
+                }
+                myTimeout = setTimeout(append, 500);
+                console.log(squares);
+
+            
+            }
         }
 
     }
+
 }
 
 // Piece.prototype.downLeft = function () {
@@ -121,7 +218,7 @@ for (let i = 0; i < 3; i++) {
     for (let j = 1; j < 8; j += 2) {
         if (i == 1) { j--; }
         var piece = document.createElement("div");
-        piece.className = "pieceUp";
+        piece.className = "pieceTop";
         rows[i].childNodes[j].appendChild(piece);
 
 
@@ -151,7 +248,7 @@ for (let i = 5; i < 8; i++) {
     for (let j = 0; j < 8; j += 2) {
         if (i == 6) { j++; }
         var piece = document.createElement("div");
-        piece.className = "pieceDown";
+        piece.className = "pieceBot";
         rows[i].childNodes[j].appendChild(piece);
 
         const p = new Piece(indexBot, piece, i);
