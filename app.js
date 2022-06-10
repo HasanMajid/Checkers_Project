@@ -12,6 +12,7 @@ make it so one player can go at a time (take turns)
 optimize your code
 machine learning AI (for single player mode)
 */
+var squaresA = [];
 
 var rows = [];
 var pieces = [];
@@ -82,6 +83,12 @@ function Piece(index, piece, row) {
                 squares[indexA + adderA + 1].style = "background-color:black;";
                 squares[indexA + adderA + 1].onclick = null;
 
+                for (var i = 0; i < squaresA.length; i++) {
+                    squaresA[i].style = "background-color:black";
+                    squaresA[i].onclick = null;
+                }
+                squaresA = [];
+
                 if (pieceA != piece) {
                     moveDown();
                 }
@@ -127,7 +134,27 @@ function Piece(index, piece, row) {
                 function eat(index, row) {
                     if (!squares[index].firstChild) {
                         squares[index].style = "background-color:orange;";
-                        
+                        squaresA.push(squares[index]);
+                        squares[index].onclick = function () {
+                            squares[index].style = "background-color:black";
+                            squares[index].onclick = null;
+
+                            piece.onclick = null;
+                            let moveby = 145;
+                            piece.style = `transform: translate (${moveby * (-1)}px, ${moveby}px)`;
+                            let append = function () {
+                                squares[index - 14].firstChild.remove();
+                                row += 2;
+                                squares[index].appendChild(piece);
+                                piece.style = `transform: translate(0px,0px)`;
+                                piece.onclick = moveDown;
+                            }
+                            myTimeout = setTimeout(append, 500);
+                            piece.classList.remove("active");
+                            console.log(pieceA.className);
+                            console.log(squares);
+                        }
+
                     }
                     else {
                         return;
@@ -135,16 +162,16 @@ function Piece(index, piece, row) {
 
                     if (squares[index + adder] && squares[index + 7] && row < 7) {
                         if (squares[index + adder].firstChild) {
-                            if ((index - 4) % 8 !== 0 && squares[index + adder].firstChild.classList.contains("pieceBot") ) {
-                                index += 7;
+                            if ((index - 4) % 8 !== 0 && squares[index + adder].firstChild.classList.contains("pieceBot")) {
                                 row += 2;
+                                index+=7;
                                 eat(index)
                             }
                         }
                     }
 
                 }
-                eat(index + 7,row);
+                eat(index + 7, row);
                 // if (squares[index + 7 ].firstChild == null){
                 //     squares[index + 7 ].style = "background-color:orange;";
                 // }
