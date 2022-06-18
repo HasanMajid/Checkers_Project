@@ -2,7 +2,6 @@
 Jump over the pieces 
     jump over the pieces consecutively
     animate each individual jump over each piece
-
 remove pieces once they have been jumped over
     in consecutive order
     
@@ -13,6 +12,7 @@ optimize your code
 machine learning AI (for single player mode)
 */
 var squaresA = [];
+var jumpIndices = [];
 
 var rows = [];
 var pieces = [];
@@ -67,6 +67,7 @@ function Piece(index, piece, row) {
             return;
         }
         if (!pieceB.classList.contains("active")) {
+            console.log(squaresA[0]);
             if (row % 2 == 1) {
                 adder = 3;
             }
@@ -95,7 +96,8 @@ function Piece(index, piece, row) {
                 console.log(piece.classList)
                 return;
             }
-            if ((squares[index + adder].firstChild == null && (index - 4) % 8 !== 0) || (squares[index + adder + 1].firstChild == null && (index - 3) % 8 !== 0)) {
+            if ((squares[index + adder].firstChild == null && (index - 4) % 8 !== 0) || (squares[index + adder + 1].firstChild == null && (index - 3) % 8 !== 0) ||
+                (squares[index + adder].firstChild != null && (index - 4) % 8 !== 0 && squares[index + 7].firstChild == null && (index % 8 !== 0))) {
                 piece.classList.add("active");
                 pieceA = piece;
                 indexA = index;
@@ -111,6 +113,13 @@ function Piece(index, piece, row) {
                     squares[index + adder].onclick = null;
                     squares[index + adder + 1].style = "background-color:black;";
                     squares[index + adder + 1].onclick = null;
+                    console.log("squaresA length: ", squaresA.length)
+                    for (var i = 0; i < squaresA.length; i++) {
+                        console.log(squaresA[i]);
+                        squaresA[i].style = "background-color:black";
+                        squaresA[i].onclick = null;
+                    }
+                    squaresA = [];
 
                     piece.onclick = null;
                     let moveby = 72.5;
@@ -126,33 +135,42 @@ function Piece(index, piece, row) {
                     myTimeout = setTimeout(append, 500);
                     piece.classList.remove("active");
                     console.log(pieceA.className);
-                    console.log(squares);
                 }
             }
             //case for when there is a piece on the left side
-            else if ((index - 4) % 8 !== 0 && squares[index + adder].firstChild.classList.contains("pieceBot") && squares[index + 7]) {
-                function eat(index, row) {
-                    if (!squares[index].firstChild) {
-                        squares[index].style = "background-color:orange;";
-                        squaresA.push(squares[index]);
-                        squares[index].onclick = function () {
-                            squares[index].style = "background-color:black";
-                            squares[index].onclick = null;
+            else if ((index - 4) % 8 !== 0 && (index) % 8 !== 0 && squares[index + adder].firstChild.classList.contains("pieceBot") && squares[index + 7]) {
+                // Eats pieces
+                function eat(temp, row, startIndex) {
+                    if (!squares[temp].firstChild) {
+                        squares[temp].style = "background-color:orange;";
+                        squaresA.push(squares[temp]);
+                        console.log("before onclick: ", temp);
+                        squares[temp].onclick = function () {
+                            console.log("start of onclick: ", temp);
+                            squares[temp].style = "background-color:black";
+                            squares[temp].onclick = null;
+                            squares[indexA + adderA].style = "background-color:black;";
+                            squares[indexA + adderA].onclick = null;
+                            squares[indexA + adderA + 1].style = "background-color:black;";
+                            squares[indexA + adderA + 1].onclick = null;
+
+                            jumpIndices.unshift(temp);
 
                             piece.onclick = null;
                             let moveby = 145;
                             piece.style = `transform: translate (${moveby * (-1)}px, ${moveby}px)`;
                             let append = function () {
-                                squares[index - 14].firstChild.remove();
+                                squares[temp - 7].firstChild.remove();
                                 row += 2;
-                                squares[index].appendChild(piece);
+                                index = temp;
+                                squares[temp].appendChild(piece);
                                 piece.style = `transform: translate(0px,0px)`;
                                 piece.onclick = moveDown;
                             }
                             myTimeout = setTimeout(append, 500);
                             piece.classList.remove("active");
+                            console.log("End of onclick: ", temp);
                             console.log(pieceA.className);
-                            console.log(squares);
                         }
 
                     }
@@ -160,18 +178,20 @@ function Piece(index, piece, row) {
                         return;
                     }
 
-                    if (squares[index + adder] && squares[index + 7] && row < 7) {
-                        if (squares[index + adder].firstChild) {
-                            if ((index - 4) % 8 !== 0 && squares[index + adder].firstChild.classList.contains("pieceBot")) {
+                    if (squares[temp + adder] && squares[temp + adder].firstChild && squares[temp + adder].firstChild.classList.contains("pieceBot") && squares[temp + 7] && !squares[temp + 7].firstChild && row < 7) {
+                        if (squares[temp + adder].firstChild) {
+                            if ((temp - 4) % 8 !== 0 && squares[temp + adder].firstChild.classList.contains("pieceBot")) {
                                 row += 2;
-                                index+=7;
-                                eat(index)
+                                temp += 7;
+                                console.log("adds 7, so: ", temp);
+                                eat(temp)
                             }
                         }
                     }
 
                 }
-                eat(index + 7, row);
+                console.log("before eat: ", index);
+                eat(index + 7, row, index);
                 // if (squares[index + 7 ].firstChild == null){
                 //     squares[index + 7 ].style = "background-color:orange;";
                 // }
@@ -186,6 +206,13 @@ function Piece(index, piece, row) {
                     squares[index + adder].onclick = null;
                     squares[index + adder + 1].style = "background-color:black;";
                     squares[index + adder + 1].onclick = null;
+                    console.log("squaresA length: ", squaresA.length)
+                    for (var i = 0; i < squaresA.length; i++) {
+                        console.log(squaresA[i]);
+                        squaresA[i].style = "background-color:black";
+                        squaresA[i].onclick = null;
+                    }
+                    squaresA = [];
 
                     piece.onclick = null;
                     let moveby = 72.5;
@@ -205,6 +232,7 @@ function Piece(index, piece, row) {
                 }
             }
         }
+        console.log("finished, squaresA length: ", squaresA.length);
     }
 
     function moveUp() {
